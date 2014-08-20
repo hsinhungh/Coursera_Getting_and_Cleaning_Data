@@ -4,12 +4,12 @@ This R script is to be applied on the "Human Activity Recognition Using Smartpho
 
 The script performs the following operations:
 
-  1. From both training and test data sets, extracts only the measurements on the mean and standard deviation for each measurement.
-  2. Labels each measurements (columns) with descriptive names.
+  1. From both training and test data sets, extracts only the fields of the mean and standard deviation for each measurement.
+  2. Labels each measurement with descriptive names.
   3. Adds subject and activity codes into extracted data sets.
   4. Merges extracted training and test data sets
   5. Labels activities with descriptive names.
-  6. The script finally creates an independent tidy data set with the average of each variable per activity per subject.
+  6. Finally creates an independent tidy data set containing the average of each variable per activity per subject.
 
 
 The first 3 columns in the tidy data set are record identifiers:
@@ -18,7 +18,7 @@ The first 3 columns in the tidy data set are record identifiers:
  * subject: subject id that performs the activity
  * activity: activity code matching the activity name
 
-The measurement columns in the tidy data set are the average value of the mean ( -mean() ) and standard deviation ( -std() ) on below estimates per activity per subject:
+The measurement columns in the tidy data set are the average value of the mean ( -mean() ) and standard deviation ( -std() ) on below measurements per activity per subject:
 
  * tBodyAcc-XYZ
  * tGravityAcc-XYZ
