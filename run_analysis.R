@@ -2,6 +2,9 @@ setwd("~/R_work/UCI HAR Dataset")
 
 library(data.table)
 
+# define set of files to read data from
+datafile_set <- list(c("./test/X_test.txt","./test/y_test.txt","./test/subject_test.txt"),c("./train/X_train.txt","./train/y_train.txt","./train/subject_train.txt"))
+
 #read feature column names into a vector
 var_all <- read.table("./features.txt",colClasses=c("NULL","character"),sep="")[,1]
 
@@ -9,14 +12,15 @@ var_all <- read.table("./features.txt",colClasses=c("NULL","character"),sep="")[
 # needed columns (mean and std)
 sel_var_logic <- grepl(".*mean\\(\\).*|.*std\\(\\).*",var_all)
 
-#column name vector
+# vector of selected column names
 sel_var_names <- var_all[sel_var_logic]
 
-# testset <- fread("./test/X_test.txt") #fread can't handle multiple space as the separator
+# fread can't handle multiple space as the separator
+# testset <- fread("./test/X_test.txt") 
 
 # function to read and combine data from different files
 readDataFile <- function(fname_set) {
-        ds <- read.table(fname_set[1],sep="") # read whole file into a data frame
+        ds <- read.table(fname_set[1],sep="") # read measurement file into a data frame
         ds <- ds[,sel_var_logic] # keep only desired columns
         ds <- data.table(ds) # convert data frame to a data table
         setnames(ds,sel_var_names) # assign descriptive column names
@@ -26,10 +30,8 @@ readDataFile <- function(fname_set) {
         ds[,c('subject','activity'):=list(subjIndex,actIndex)] # adding subject and activity columns to the main data table
 }
 
-# define set of files to read data from
-datafile_set <- list(c("./test/X_test.txt","./test/y_test.txt","./test/subject_test.txt"),c("./train/X_train.txt","./train/y_train.txt","./train/subject_train.txt"))
 
-# parsing and merging data from different sets of files
+# reading, modifying, and combining data sets
 mds <- rbindlist(lapply(datafile_set,readDataFile))
 setkey(mds,activity)
 
@@ -41,8 +43,13 @@ setkey(df_act,activity)
 # merging datasets and activity labels
 mds<-merge(mds,df_act)
 
-# calculating means group by activity types
+# calculating means by activity type and by subject
 mds_avg <- mds[,lapply(.SD,mean),by=c('actName','subject')]
+# sorting
 mds_avg <- mds_avg[order(activity,subject)]
-#mds_avg[,activity:=NULL] #drop unused activity index column
+
+# drop unused activity index column
+# mds_avg[,activity:=NULL] 
+
+# write the tidy data set to a file
 write.table(mds_avg,file='./tidy_avg.txt',row.names = F,sep = "\t",quote=F)
